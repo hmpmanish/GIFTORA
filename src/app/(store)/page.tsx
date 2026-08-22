@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Package, ShieldCheck, Star, Headset } from "lucide-react";
+import { ArrowRight, Package, ShieldCheck, Star, Headset, CheckCircle2 } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 
@@ -41,46 +41,61 @@ export default async function HomePage() {
     bestsellers = data[3];
   } catch (err: any) {
     console.error("Database error on homepage:", err);
-    // If DB fails, we still render the page but with empty data
-    // We'll also inject a small debug script to alert the error in the browser console
   }
 
-  const ProductGrid = ({ products, title, link }: any) => {
+  const ProductGrid = ({ products, title, link, subtitle }: any) => {
     if (!products || products.length === 0) return null;
 
     return (
-      <section className="py-24">
+      <section className="py-24 bg-slate-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-center mb-16 text-center">
-            <h2 className="text-4xl md:text-5xl font-heading font-normal tracking-tight text-slate-900 mb-6 uppercase">{title}</h2>
-            <div className="w-16 h-[1px] bg-black mb-6"></div>
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-4">{title}</h2>
+              {subtitle && <p className="text-slate-600 text-lg">{subtitle}</p>}
+            </div>
             {link && (
-              <Link href={link} className="text-sm uppercase tracking-widest hover:text-gray-500 transition-colors">
-                View Collection
+              <Link href={link} className="mt-6 md:mt-0 group flex items-center text-primary font-semibold hover:text-accent transition-colors">
+                Explore Collection <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {products.map((product: any) => (
               <Link key={product.id} href={`/products/${product.slug}`} className="group block">
-                <div className="aspect-[3/4] relative overflow-hidden bg-stone-100 mb-6">
-                  {product.images?.[0] ? (
-                    <img
-                      src={product.images[0].url}
-                      alt={product.name}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-sm uppercase tracking-widest text-gray-400">
-                      No Image
+                <div className="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
+                  <div className="aspect-[4/5] relative bg-slate-100 overflow-hidden">
+                    {product.isNewArrival && (
+                      <Badge className="absolute top-4 left-4 z-10 bg-accent hover:bg-accent/90 text-white font-medium px-2.5 py-0.5">
+                        New
+                      </Badge>
+                    )}
+                    {product.images?.[0] ? (
+                      <img
+                        src={product.images[0].url}
+                        alt={product.name}
+                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-in-out"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-400 font-medium">
+                        No Image Available
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h3 className="font-semibold text-lg text-slate-900 mb-2 line-clamp-1">{product.name}</h3>
+                    {product.category && (
+                      <span className="text-sm text-slate-500 mb-4">{product.category.name}</span>
+                    )}
+                    <div className="mt-auto flex items-center justify-between">
+                      <div className="font-bold text-xl text-primary">
+                        ₹{product.price.toLocaleString()}
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors text-slate-400">
+                        <ArrowRight className="w-5 h-5" />
+                      </div>
                     </div>
-                  )}
-                </div>
-                <div className="text-center">
-                  <h3 className="font-heading text-lg font-normal mb-2 tracking-wide uppercase">{product.name}</h3>
-                  <div className="text-sm tracking-widest text-gray-600">
-                    ₹{product.price.toLocaleString()}
                   </div>
                 </div>
               </Link>
@@ -92,26 +107,84 @@ export default async function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#faf9f6]">
+    <div className="flex flex-col min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Subtle background texture or gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-200/50 to-[#faf9f6] z-0" />
+      <section className="relative min-h-[90vh] flex items-center justify-center bg-primary overflow-hidden">
+        {/* Abstract Corporate Background Elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-accent/20 to-transparent"></div>
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-accent rounded-full blur-[120px] opacity-30"></div>
+          <div className="absolute top-20 right-20 w-72 h-72 bg-blue-400 rounded-full blur-[100px] opacity-20"></div>
+        </div>
         
-        <div className="container mx-auto px-4 relative z-10 text-center flex flex-col items-center">
-          <span className="uppercase tracking-[0.3em] text-xs font-semibold mb-6 text-gray-500">The Art of Gifting</span>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-normal tracking-tight text-slate-900 mb-8 max-w-4xl leading-tight">
-            Gifts That Make <br/><span className="italic font-light">Moments Last.</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-            Curated, premium presents for every special occasion. Discover our exclusive collection of luxury gifts tailored for those you love.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link href="/shop">
-              <Button size="lg" className="w-full sm:w-auto text-sm tracking-widest uppercase px-12 py-6 rounded-none bg-black hover:bg-gray-800 text-white transition-all">
-                Shop The Collection
-              </Button>
-            </Link>
+        <div className="container mx-auto px-4 relative z-10 grid md:grid-cols-2 gap-12 items-center">
+          <div className="text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-blue-100 text-sm font-medium mb-8 backdrop-blur-sm">
+              <ShieldCheck className="w-4 h-4 text-accent" />
+              <span>India's Most Trusted Gifting Platform</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.1]">
+              Premium Gifting. <br/>
+              <span className="text-accent">Redefined.</span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-xl leading-relaxed">
+              Elevate your corporate and personal relationships with our curated selection of high-end, reliable, and exquisitely packaged gifts.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/shop">
+                <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base font-semibold bg-accent hover:bg-accent/90 text-white rounded-lg transition-all shadow-lg shadow-accent/25">
+                  Explore Catalog
+                </Button>
+              </Link>
+              <Link href="/contact">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-base font-semibold border-white/30 text-white hover:bg-white/10 rounded-lg transition-all backdrop-blur-sm">
+                  Corporate Inquiry
+                </Button>
+              </Link>
+            </div>
+
+            <div className="mt-12 flex items-center gap-8 text-sm text-slate-400 font-medium">
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-accent"/> 100% Quality Guarantee</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-accent"/> Secure Delivery</div>
+            </div>
+          </div>
+          
+          <div className="hidden md:block relative">
+            {/* Minimalist Dashboard/Gift representation */}
+            <div className="relative w-full aspect-square rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 backdrop-blur-md shadow-2xl p-8 flex flex-col justify-center items-center">
+              <div className="w-3/4 h-3/4 bg-white/5 rounded-xl border border-white/10 relative overflow-hidden flex items-center justify-center shadow-inner">
+                <Package className="w-32 h-32 text-accent/80" strokeWidth={1} />
+                <div className="absolute inset-0 bg-gradient-to-tr from-accent/20 to-transparent"></div>
+              </div>
+              <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-white/10 rounded-xl border border-white/20 backdrop-blur-xl flex items-center justify-center shadow-xl">
+                 <Star className="w-12 h-12 text-yellow-400" fill="currentColor" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Badges */}
+      <section className="py-16 bg-white border-b border-slate-200">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { icon: ShieldCheck, title: "Secure Transactions", desc: "Enterprise-grade encryption" },
+              { icon: Package, title: "Reliable Fulfillment", desc: "Tracked & insured shipping" },
+              { icon: Star, title: "Premium Curation", desc: "Rigorous quality control" },
+              { icon: Headset, title: "Dedicated Support", desc: "24/7 client assistance" }
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col items-start p-6 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
+                <div className="w-12 h-12 rounded-lg bg-primary/5 flex items-center justify-center mb-4">
+                  <item.icon className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
+                <p className="text-sm text-slate-500">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -120,25 +193,24 @@ export default async function HomePage() {
       {categories.length > 0 && (
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-heading tracking-widest uppercase mb-4">Curated For You</h2>
-              <div className="w-12 h-[1px] bg-black mx-auto"></div>
+            <div className="flex flex-col items-center text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-4">Curated Solutions</h2>
+              <p className="text-lg text-slate-600 max-w-2xl">Discover tailored gifting categories designed to meet the highest professional standards.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {categories.slice(0, 3).map((category, index) => (
                 <Link key={category.id} href={`/shop?category=${category.slug}`} className="group block">
-                  <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
-                    {/* Placeholder for category images if none exist */}
-                    <div className="absolute inset-0 bg-stone-200 group-hover:scale-105 transition-transform duration-700 ease-in-out">
-                       {/* You can replace this with actual category images later */}
+                  <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm group-hover:shadow-lg transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent z-10"></div>
+                    <div className="absolute inset-0 bg-slate-200 group-hover:scale-105 transition-transform duration-700 ease-in-out">
+                       {/* Placeholder for category image */}
                     </div>
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500"></div>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
-                      <h3 className="font-heading text-3xl font-normal tracking-wider uppercase mb-4">{category.name}</h3>
-                      <span className="text-sm uppercase tracking-widest border-b border-white pb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
-                        Explore
-                      </span>
+                    <div className="absolute inset-0 z-20 flex flex-col justify-end p-8">
+                      <h3 className="text-2xl font-bold text-white mb-2">{category.name}</h3>
+                      <div className="flex items-center text-blue-200 font-medium opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                        View Category <ArrowRight className="ml-2 w-4 h-4" />
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -152,56 +224,32 @@ export default async function HomePage() {
       <ProductGrid 
         products={featuredProducts} 
         title="Signature Collection" 
+        subtitle="Our most sought-after premium items."
         link="/shop"
       />
 
-      {/* Brand Philosophy */}
-      <section className="py-32 bg-stone-900 text-white text-center px-4">
-        <div className="max-w-4xl mx-auto flex flex-col items-center">
-          <Star className="w-8 h-8 mb-8 text-stone-400" />
-          <h2 className="text-4xl md:text-5xl font-heading font-light leading-snug mb-8">
-            "A gift is more than an object. It is a memory materialized, a bond strengthened, a moment made eternal."
+      {/* Corporate Philosophy */}
+      <section className="py-24 bg-primary text-white text-center px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 mix-blend-overlay"></div>
+        <div className="max-w-4xl mx-auto flex flex-col items-center relative z-10">
+          <ShieldCheck className="w-12 h-12 mb-8 text-accent" />
+          <h2 className="text-3xl md:text-5xl font-bold leading-tight mb-8">
+            "Trust is built on consistency. We deliver excellence with every package."
           </h2>
-          <span className="uppercase tracking-[0.2em] text-sm text-stone-400">Our Philosophy</span>
+          <div className="w-20 h-1 bg-accent rounded-full mb-8"></div>
+          <span className="uppercase tracking-widest text-sm text-slate-300 font-semibold">The Giftora Standard</span>
         </div>
       </section>
 
       {/* New Arrivals */}
-      <div className="bg-[#faf9f6]">
+      <div className="bg-white">
         <ProductGrid 
           products={newArrivals} 
-          title="Just Arrived" 
+          title="Latest Additions" 
+          subtitle="New premium inventory just arrived."
           link="/shop?sort=newest"
         />
       </div>
-
-      {/* Trust Badges */}
-      <section className="py-24 bg-white border-t border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-center divide-y md:divide-y-0 md:divide-x divide-gray-200">
-            <div className="pt-8 md:pt-0 px-4">
-              <Package className="w-8 h-8 mx-auto mb-6 text-gray-400" strokeWidth={1} />
-              <h3 className="font-heading uppercase tracking-wider mb-2">Complimentary Shipping</h3>
-              <p className="text-sm text-gray-500 font-light">On all orders across India</p>
-            </div>
-            <div className="pt-8 md:pt-0 px-4">
-              <ShieldCheck className="w-8 h-8 mx-auto mb-6 text-gray-400" strokeWidth={1} />
-              <h3 className="font-heading uppercase tracking-wider mb-2">Secure Transactions</h3>
-              <p className="text-sm text-gray-500 font-light">100% safe & encrypted</p>
-            </div>
-            <div className="pt-8 md:pt-0 px-4">
-              <Star className="w-8 h-8 mx-auto mb-6 text-gray-400" strokeWidth={1} />
-              <h3 className="font-heading uppercase tracking-wider mb-2">Artisan Quality</h3>
-              <p className="text-sm text-gray-500 font-light">Curated premium selection</p>
-            </div>
-            <div className="pt-8 md:pt-0 px-4">
-              <Headset className="w-8 h-8 mx-auto mb-6 text-gray-400" strokeWidth={1} />
-              <h3 className="font-heading uppercase tracking-wider mb-2">Bespoke Support</h3>
-              <p className="text-sm text-gray-500 font-light">We are here to assist you</p>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

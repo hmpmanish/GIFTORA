@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Montserrat } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-});
-
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "GIFTORA | Gifts That Make Moments Last",
-  description: "Premium Indian gift brand for birthdays, anniversaries, friendships and every special moment.",
+  title: "GIFTORA | Premium Corporate & Personal Gifting",
+  description: "Secure, reliable, and premium gifting solutions for professionals.",
 };
 
 export const dynamic = "force-dynamic";
@@ -24,9 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${montserrat.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-900 selection:bg-blue-200 selection:text-blue-900">
         <Providers>{children}</Providers>
       </body>
     </html>
