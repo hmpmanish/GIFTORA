@@ -26,6 +26,10 @@ export default function Error({
         <p className="text-muted-foreground max-w-md mx-auto">
           We encountered an unexpected issue while loading this page. Our team has been notified.
         </p>
+        <div className="bg-red-50 text-red-900 p-4 rounded-md mt-4 text-left font-mono text-xs overflow-auto max-w-2xl mx-auto border border-red-200">
+          <p className="font-bold mb-2">Debug Error Message:</p>
+          <p>{error.message || "Unknown error"}</p>
+        </div>
       </div>
       <div className="flex gap-4">
         <Button onClick={() => reset()} size="lg">
