@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/badge";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  let categories = [];
-  let featuredProducts = [];
-  let newArrivals = [];
-  let bestsellers = [];
+  let categories: any[] = [];
+  let featuredProducts: any[] = [];
+  let newArrivals: any[] = [];
+  let bestsellers: any[] = [];
 
   try {
     const data = await Promise.all([
