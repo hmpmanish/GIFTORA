@@ -12,10 +12,12 @@ import prisma from "@/lib/prisma";
 export default async function ProductDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  const { slug } = await params;
+
   const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       images: true,
       category: true,
@@ -113,11 +115,8 @@ export default async function ProductDetailPage({
               )}
             </div>
 
-            <div className="flex gap-4">
+            <div className="w-full">
               <AddToCartButton product={product} inStock={inStock} />
-              <Button variant="outline" size="icon" className="w-12 h-12 shrink-0 rounded-xl">
-                <Star className="h-5 w-5" />
-              </Button>
             </div>
           </div>
 

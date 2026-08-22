@@ -185,11 +185,9 @@ export default function AddressesPage() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold tracking-tight">Saved Addresses</h1>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={openNewAddress}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Address
-                </Button>
+              <DialogTrigger render={<Button onClick={openNewAddress} />}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Address
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>

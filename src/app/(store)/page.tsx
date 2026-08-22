@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Gift, Heart, Star, ShoppingCart, Package } from "lucide-react";
+import { ArrowRight, Package, ShieldCheck, Star, Headset } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 
@@ -14,79 +13,63 @@ export default async function HomePage() {
       take: 4,
     }),
     prisma.product.findMany({
-      where: { isActive: true, isFeatured: true },
+      where: { isActive: true },
       take: 4,
+      orderBy: { price: "desc" }, // fallback logic for featured
       include: { images: true, category: true },
     }),
     prisma.product.findMany({
-      where: { isActive: true, isNewArrival: true },
+      where: { isActive: true },
       take: 4,
       orderBy: { createdAt: "desc" },
       include: { images: true, category: true },
     }),
     prisma.product.findMany({
-      where: { isActive: true, isBestseller: true },
+      where: { isActive: true },
       take: 4,
+      orderBy: { price: "asc" }, // fallback logic for bestsellers
       include: { images: true, category: true },
     }),
   ]);
 
-  const ProductGrid = ({ products, title, subtitle, link }: any) => {
+  const ProductGrid = ({ products, title, link }: any) => {
     if (!products || products.length === 0) return null;
 
     return (
-      <section className="py-16">
+      <section className="py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-end mb-10">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">{title}</h2>
-              <p className="text-slate-600">{subtitle}</p>
-            </div>
+          <div className="flex flex-col items-center justify-center mb-16 text-center">
+            <h2 className="text-4xl md:text-5xl font-heading font-normal tracking-tight text-slate-900 mb-6 uppercase">{title}</h2>
+            <div className="w-16 h-[1px] bg-black mb-6"></div>
             {link && (
-              <Link href={link} className="hidden sm:flex items-center text-primary font-medium hover:underline">
-                View all <ArrowRight className="ml-1 h-4 w-4" />
+              <Link href={link} className="text-sm uppercase tracking-widest hover:text-gray-500 transition-colors">
+                View Collection
               </Link>
             )}
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
             {products.map((product: any) => (
-              <Link key={product.id} href={`/products/${product.slug}`}>
-                <Card className="h-full overflow-hidden hover:shadow-lg transition-all border group">
-                  <div className="aspect-square relative bg-slate-100 overflow-hidden">
-                    {product.images?.[0] ? (
-                      <img
-                        src={product.images[0].url}
-                        alt={product.name}
-                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-4xl">
-                        🎁
-                      </div>
-                    )}
-                    {product.isNewArrival && (
-                      <Badge className="absolute top-2 left-2 z-10 bg-blue-500 hover:bg-blue-600">New</Badge>
-                    )}
-                    {product.isBestseller && (
-                      <Badge className="absolute top-2 left-2 z-10 bg-amber-500 hover:bg-amber-600">Bestseller</Badge>
-                    )}
-                  </div>
-                  <CardContent className="p-4 flex flex-col">
-                    <div className="text-xs text-muted-foreground mb-1">{product.category?.name}</div>
-                    <h3 className="font-medium text-base line-clamp-2 mb-2 flex-grow">{product.name}</h3>
-                    <div className="flex items-center justify-between mt-auto">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold">₹{product.price.toLocaleString()}</span>
-                        {product.compareAtPrice && product.compareAtPrice > product.price && (
-                          <span className="text-xs text-muted-foreground line-through">
-                            ₹{product.compareAtPrice.toLocaleString()}
-                          </span>
-                        )}
-                      </div>
+              <Link key={product.id} href={`/products/${product.slug}`} className="group block">
+                <div className="aspect-[3/4] relative overflow-hidden bg-stone-100 mb-6">
+                  {product.images?.[0] ? (
+                    <img
+                      src={product.images[0].url}
+                      alt={product.name}
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-sm uppercase tracking-widest text-gray-400">
+                      No Image
                     </div>
-                  </CardContent>
-                </Card>
+                  )}
+                </div>
+                <div className="text-center">
+                  <h3 className="font-heading text-lg font-normal mb-2 tracking-wide uppercase">{product.name}</h3>
+                  <div className="text-sm tracking-widest text-gray-600">
+                    ₹{product.price.toLocaleString()}
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
@@ -96,78 +79,57 @@ export default async function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#faf9f6]">
       {/* Hero Section */}
-      <section className="relative bg-amber-50 py-20 lg:py-32 overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="max-w-2xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-6">
-                Find a Gift They'll <span className="text-primary">Never Forget.</span>
-              </h1>
-              <p className="text-lg md:text-xl text-slate-600 mb-8">
-                Thoughtful gifts for birthdays, anniversaries, friendships and every special moment.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/shop">
-                  <Button size="lg" className="w-full sm:w-auto text-lg px-8">
-                    Shop Gifts
-                  </Button>
-                </Link>
-                <Link href="/search">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 bg-white/50">
-                    Explore Collections
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <div className="hidden lg:block relative">
-              <div className="aspect-square bg-white rounded-full absolute -right-20 -top-20 w-[600px] h-[600px] opacity-50 blur-3xl" />
-              <div className="relative h-[500px] w-full rounded-2xl overflow-hidden shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-tr from-rose-200 to-amber-200 flex flex-col items-center justify-center">
-                   <Gift className="w-48 h-48 text-white opacity-80" />
-                   <h2 className="text-3xl font-bold text-white mt-4 tracking-wider">GIFTORA</h2>
-                </div>
-              </div>
-            </div>
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+        {/* Subtle background texture or gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-200/50 to-[#faf9f6] z-0" />
+        
+        <div className="container mx-auto px-4 relative z-10 text-center flex flex-col items-center">
+          <span className="uppercase tracking-[0.3em] text-xs font-semibold mb-6 text-gray-500">The Art of Gifting</span>
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-normal tracking-tight text-slate-900 mb-8 max-w-4xl leading-tight">
+            Gifts That Make <br/><span className="italic font-light">Moments Last.</span>
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+            Curated, premium presents for every special occasion. Discover our exclusive collection of luxury gifts tailored for those you love.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <Link href="/shop">
+              <Button size="lg" className="w-full sm:w-auto text-sm tracking-widest uppercase px-12 py-6 rounded-none bg-black hover:bg-gray-800 text-white transition-all">
+                Shop The Collection
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Categories Section */}
       {categories.length > 0 && (
-        <section className="py-20 bg-white">
+        <section className="py-24 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-end mb-10">
-              <div>
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Shop by Category</h2>
-                <p className="text-slate-600">Find the perfect gift for every occasion.</p>
-              </div>
-              <Link href="/shop" className="hidden sm:flex items-center text-primary font-medium hover:underline">
-                View all <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-heading tracking-widest uppercase mb-4">Curated For You</h2>
+              <div className="w-12 h-[1px] bg-black mx-auto"></div>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-              {categories.map((category, index) => {
-                const icons = [Gift, Heart, Star, Package];
-                const colors = ["bg-pink-100 text-pink-600", "bg-red-100 text-red-600", "bg-rose-100 text-rose-600", "bg-amber-100 text-amber-600"];
-                const Icon = icons[index % icons.length];
-                const color = colors[index % colors.length];
-
-                return (
-                  <Link key={category.id} href={`/shop?category=${category.slug}`}>
-                    <Card className="group cursor-pointer hover:shadow-lg transition-all border-0 bg-slate-50 overflow-hidden">
-                      <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-                        <div className={`p-4 rounded-full ${color} group-hover:scale-110 transition-transform`}>
-                          <Icon className="h-8 w-8" />
-                        </div>
-                        <h3 className="font-semibold text-lg">{category.name}</h3>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                );
-              })}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {categories.slice(0, 3).map((category, index) => (
+                <Link key={category.id} href={`/shop?category=${category.slug}`} className="group block">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
+                    {/* Placeholder for category images if none exist */}
+                    <div className="absolute inset-0 bg-stone-200 group-hover:scale-105 transition-transform duration-700 ease-in-out">
+                       {/* You can replace this with actual category images later */}
+                    </div>
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500"></div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
+                      <h3 className="font-heading text-3xl font-normal tracking-wider uppercase mb-4">{category.name}</h3>
+                      <span className="text-sm uppercase tracking-widest border-b border-white pb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
+                        Explore
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         </section>
@@ -176,60 +138,53 @@ export default async function HomePage() {
       {/* Featured Products */}
       <ProductGrid 
         products={featuredProducts} 
-        title="Featured Gifts" 
-        subtitle="Handpicked items just for you" 
+        title="Signature Collection" 
         link="/shop"
       />
 
+      {/* Brand Philosophy */}
+      <section className="py-32 bg-stone-900 text-white text-center px-4">
+        <div className="max-w-4xl mx-auto flex flex-col items-center">
+          <Star className="w-8 h-8 mb-8 text-stone-400" />
+          <h2 className="text-4xl md:text-5xl font-heading font-light leading-snug mb-8">
+            "A gift is more than an object. It is a memory materialized, a bond strengthened, a moment made eternal."
+          </h2>
+          <span className="uppercase tracking-[0.2em] text-sm text-stone-400">Our Philosophy</span>
+        </div>
+      </section>
+
       {/* New Arrivals */}
-      <div className="bg-slate-50">
+      <div className="bg-[#faf9f6]">
         <ProductGrid 
           products={newArrivals} 
-          title="New Arrivals" 
-          subtitle="Check out our latest additions" 
+          title="Just Arrived" 
           link="/shop?sort=newest"
         />
       </div>
 
-      {/* Best Sellers */}
-      <ProductGrid 
-        products={bestsellers} 
-        title="Best Sellers" 
-        subtitle="Our most loved gifts" 
-        link="/shop?sort=popular"
-      />
-
       {/* Trust Badges */}
-      <section className="py-16 bg-slate-50 border-t">
+      <section className="py-24 bg-white border-t border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                🚚
-              </div>
-              <h3 className="font-semibold">Fast Delivery</h3>
-              <p className="text-sm text-muted-foreground">All over India</p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-center divide-y md:divide-y-0 md:divide-x divide-gray-200">
+            <div className="pt-8 md:pt-0 px-4">
+              <Package className="w-8 h-8 mx-auto mb-6 text-gray-400" strokeWidth={1} />
+              <h3 className="font-heading uppercase tracking-wider mb-2">Complimentary Shipping</h3>
+              <p className="text-sm text-gray-500 font-light">On all orders across India</p>
             </div>
-            <div>
-              <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                💳
-              </div>
-              <h3 className="font-semibold">Secure Payment</h3>
-              <p className="text-sm text-muted-foreground">100% safe & secure</p>
+            <div className="pt-8 md:pt-0 px-4">
+              <ShieldCheck className="w-8 h-8 mx-auto mb-6 text-gray-400" strokeWidth={1} />
+              <h3 className="font-heading uppercase tracking-wider mb-2">Secure Transactions</h3>
+              <p className="text-sm text-gray-500 font-light">100% safe & encrypted</p>
             </div>
-            <div>
-              <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                ⭐
-              </div>
-              <h3 className="font-semibold">Premium Quality</h3>
-              <p className="text-sm text-muted-foreground">Curated gifts</p>
+            <div className="pt-8 md:pt-0 px-4">
+              <Star className="w-8 h-8 mx-auto mb-6 text-gray-400" strokeWidth={1} />
+              <h3 className="font-heading uppercase tracking-wider mb-2">Artisan Quality</h3>
+              <p className="text-sm text-gray-500 font-light">Curated premium selection</p>
             </div>
-            <div>
-              <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                🎧
-              </div>
-              <h3 className="font-semibold">Customer Support</h3>
-              <p className="text-sm text-muted-foreground">We're here to help</p>
+            <div className="pt-8 md:pt-0 px-4">
+              <Headset className="w-8 h-8 mx-auto mb-6 text-gray-400" strokeWidth={1} />
+              <h3 className="font-heading uppercase tracking-wider mb-2">Bespoke Support</h3>
+              <p className="text-sm text-gray-500 font-light">We are here to assist you</p>
             </div>
           </div>
         </div>

@@ -22,7 +22,8 @@ const orderSchema = z.object({
     state: z.string(),
     pincode: z.string(),
   }).optional(),
-  paymentMethod: z.enum(["COD", "RAZORPAY"]),
+  paymentMethod: z.enum(["COD", "RAZORPAY", "UPI"]),
+  upiUtr: z.string().optional(),
   items: z.array(z.object({
     productId: z.string(),
     quantity: z.number().int().positive(),
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Invalid request", errors: result.error.flatten() }, { status: 400 });
     }
 
-    const { addressId, address, paymentMethod, items, idempotencyKey } = result.data;
+    const { addressId, address, paymentMethod, upiUtr, items, idempotencyKey } = result.data;
 
     if (!items || items.length === 0) {
       return NextResponse.json({ message: "Cart is empty" }, { status: 400 });
@@ -176,13 +177,26 @@ export async function POST(req: Request) {
         };
       }
 
+      if (paymentMethod === "UPI") {
+        await tx.payment.create({
+          data: {
+            orderId: order.id,
+            method: "UPI",
+            status: "PENDING",
+            amount: total,
+            transactionId: upiUtr,
+          },
+        });
+        return { orderId: order.id, amount: total, method: "UPI" };
+      }
+
       throw new Error("Invalid payment method");
     });
 
     return NextResponse.json(orderResult, { status: 201 });
   } catch (error: any) {
     console.error("Order creation error:", error);
-    if (error.message.includes("Insufficient stock") || error.message.includes("not available")) {
+    if (error?.message?.includes("Insufficient stock") || error?.message?.includes("not available")) {
       return NextResponse.json({ message: error.message }, { status: 409 });
     }
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });

@@ -2,8 +2,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 
-export default function OrderSuccessPage({ searchParams }: { searchParams: { orderId?: string } }) {
-  const orderId = searchParams.orderId;
+export default async function OrderSuccessPage({ searchParams }: { searchParams: Promise<{ orderId?: string }> }) {
+  const params = await searchParams;
+  const orderId = params.orderId;
 
   return (
     <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center min-h-[60vh] text-center">
