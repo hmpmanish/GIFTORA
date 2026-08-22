@@ -8,29 +8,42 @@ import { Badge } from "@/components/ui/badge";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [categories, featuredProducts, newArrivals, bestsellers] = await Promise.all([
-    prisma.category.findMany({
-      take: 4,
-    }),
-    prisma.product.findMany({
-      where: { isActive: true },
-      take: 4,
-      orderBy: { price: "desc" }, // fallback logic for featured
-      include: { images: true, category: true },
-    }),
-    prisma.product.findMany({
-      where: { isActive: true },
-      take: 4,
-      orderBy: { createdAt: "desc" },
-      include: { images: true, category: true },
-    }),
-    prisma.product.findMany({
-      where: { isActive: true },
-      take: 4,
-      orderBy: { price: "asc" }, // fallback logic for bestsellers
-      include: { images: true, category: true },
-    }),
-  ]);
+  let categories = [];
+  let featuredProducts = [];
+  let newArrivals = [];
+  let bestsellers = [];
+
+  try {
+    const data = await Promise.all([
+      prisma.category.findMany({ take: 4 }),
+      prisma.product.findMany({
+        where: { isActive: true },
+        take: 4,
+        orderBy: { price: "desc" },
+        include: { images: true, category: true },
+      }),
+      prisma.product.findMany({
+        where: { isActive: true },
+        take: 4,
+        orderBy: { createdAt: "desc" },
+        include: { images: true, category: true },
+      }),
+      prisma.product.findMany({
+        where: { isActive: true },
+        take: 4,
+        orderBy: { price: "asc" },
+        include: { images: true, category: true },
+      }),
+    ]);
+    categories = data[0];
+    featuredProducts = data[1];
+    newArrivals = data[2];
+    bestsellers = data[3];
+  } catch (err: any) {
+    console.error("Database error on homepage:", err);
+    // If DB fails, we still render the page but with empty data
+    // We'll also inject a small debug script to alert the error in the browser console
+  }
 
   const ProductGrid = ({ products, title, link }: any) => {
     if (!products || products.length === 0) return null;
