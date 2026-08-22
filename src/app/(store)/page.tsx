@@ -126,16 +126,16 @@ export default async function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/shop">
-                <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base font-semibold bg-accent hover:bg-blue-700 text-white rounded-lg transition-all shadow-xl hover:shadow-accent/50 hover:-translate-y-0.5">
+              <Button asChild size="lg" className="w-full sm:w-auto h-14 px-8 text-base font-semibold bg-accent hover:bg-blue-700 text-white rounded-lg transition-all shadow-xl hover:shadow-accent/50 hover:-translate-y-0.5">
+                <Link href="/shop">
                   Explore Catalog
-                </Button>
-              </Link>
-              <Link href="/contact">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-base font-semibold border-white/30 text-white hover:bg-white/10 hover:text-white rounded-lg transition-all backdrop-blur-sm">
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-base font-semibold border-white/30 text-white hover:bg-white/10 hover:text-white rounded-lg transition-all backdrop-blur-sm">
+                <Link href="/contact">
                   Corporate Inquiry
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
 
             <div className="mt-12 flex flex-wrap items-center gap-6 text-sm text-slate-300 font-medium">

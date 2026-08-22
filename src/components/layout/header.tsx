@@ -42,30 +42,30 @@ export function Header() {
             <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-slate-500 hover:text-primary hover:bg-slate-100 rounded-full transition-colors">
               <Search className="h-5 w-5" />
             </Button>
-            <Link href="/wishlist">
-              <Button variant="ghost" size="icon" className="text-slate-500 hover:text-primary hover:bg-slate-100 rounded-full transition-colors">
+            <Button asChild variant="ghost" size="icon" className="text-slate-500 hover:text-primary hover:bg-slate-100 rounded-full transition-colors">
+              <Link href="/wishlist">
                 <Heart className="h-5 w-5" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
             {session ? (
-              <Link href="/profile">
-                <Button variant="ghost" size="icon" className="text-slate-500 hover:text-primary hover:bg-slate-100 rounded-full transition-colors">
+              <Button asChild variant="ghost" size="icon" className="text-slate-500 hover:text-primary hover:bg-slate-100 rounded-full transition-colors">
+                <Link href="/profile">
                   <User className="h-5 w-5" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             ) : (
-              <Link href="/login">
-                <Button variant="ghost" size="icon" className="text-slate-500 hover:text-primary hover:bg-slate-100 rounded-full transition-colors">
+              <Button asChild variant="ghost" size="icon" className="text-slate-500 hover:text-primary hover:bg-slate-100 rounded-full transition-colors">
+                <Link href="/login">
                   <User className="h-5 w-5" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
-            <Link href="/cart">
-              <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-primary hover:bg-slate-100 rounded-full transition-colors">
+            <Button asChild variant="ghost" size="icon" className="relative text-slate-500 hover:text-primary hover:bg-slate-100 rounded-full transition-colors">
+              <Link href="/cart">
                 <ShoppingBag className="h-5 w-5" />
                 <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-accent ring-2 ring-white" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
             <Button variant="ghost" size="icon" className="md:hidden text-slate-500 hover:bg-slate-100 rounded-lg">
               <Menu className="h-6 w-6" />
             </Button>
