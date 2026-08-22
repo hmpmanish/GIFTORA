@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "Premium Indian gift brand for birthdays, anniversaries, friendships and every special moment.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
