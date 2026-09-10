@@ -9,13 +9,15 @@ export interface CartItem {
   image: string;
   quantity: number;
   stock: number;
+  size?: string;
+  color?: string;
 }
 
 interface CartStore {
   items: CartItem[];
   addItem: (item: Omit<CartItem, 'id'>) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeItem: (productId: string, size?: string, color?: string) => void;
+  updateQuantity: (productId: string, quantity: number, size?: string, color?: string) => void;
   clearCart: () => void;
   getTotal: () => number;
   getItemCount: () => number;
@@ -28,12 +30,14 @@ export const useCart = create<CartStore>()(
       
       addItem: (item) => {
         set((state) => {
-          const existingItem = state.items.find((i) => i.productId === item.productId);
+          const existingItem = state.items.find(
+            (i) => i.productId === item.productId && i.size === item.size && i.color === item.color
+          );
           
           if (existingItem) {
             return {
               items: state.items.map((i) => 
-                i.productId === item.productId 
+                i.productId === item.productId && i.size === item.size && i.color === item.color
                   ? { ...i, quantity: Math.min(i.quantity + item.quantity, i.stock) } 
                   : i
               ),
@@ -46,16 +50,16 @@ export const useCart = create<CartStore>()(
         });
       },
       
-      removeItem: (productId) => {
+      removeItem: (productId, size, color) => {
         set((state) => ({
-          items: state.items.filter((i) => i.productId !== productId),
+          items: state.items.filter((i) => !(i.productId === productId && i.size === size && i.color === color)),
         }));
       },
       
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (productId, quantity, size, color) => {
         set((state) => ({
           items: state.items.map((i) => 
-            i.productId === productId 
+            i.productId === productId && i.size === size && i.color === color
               ? { ...i, quantity: Math.max(1, Math.min(quantity, i.stock)) } 
               : i
           ),

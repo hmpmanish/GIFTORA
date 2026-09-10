@@ -7,10 +7,10 @@ export interface WishlistItem {
     id: string;
     name: string;
     price: number;
-    mrp: number;
+    compareAtPrice: number | null;
     slug: string;
     images: { url: string }[];
-    stock: number;
+    inventory: { stock: number } | null;
   };
 }
 

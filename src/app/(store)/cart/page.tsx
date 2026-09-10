@@ -47,7 +47,7 @@ export default function CartPage() {
       <div className="grid lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2 space-y-8">
           {items.map((item) => (
-            <div key={item.productId} className="flex gap-6 pb-8 border-b">
+            <div key={`${item.productId}-${item.size}-${item.color}`} className="flex gap-6 pb-8 border-b">
               <div className="w-32 h-40 bg-stone-100 shrink-0">
                 {item.image ? (
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -58,24 +58,31 @@ export default function CartPage() {
               <div className="flex-1 flex flex-col">
                 <div className="flex justify-between">
                   <div>
-                    <h3 className="font-heading text-lg uppercase tracking-wider mb-2">{item.name}</h3>
+                    <h3 className="font-heading text-lg uppercase tracking-wider mb-1">{item.name}</h3>
+                    {(item.size || item.color) && (
+                      <p className="text-sm text-gray-500 mb-2">
+                        {item.size && <span>Size: {item.size}</span>}
+                        {item.size && item.color && <span className="mx-2">|</span>}
+                        {item.color && <span>Color: {item.color}</span>}
+                      </p>
+                    )}
                     <p className="text-sm font-light text-gray-600">₹{item.price.toLocaleString()}</p>
                   </div>
-                  <button onClick={() => removeItem(item.productId)} className="text-gray-400 hover:text-red-500 transition-colors">
+                  <button onClick={() => removeItem(item.productId, item.size, item.color)} className="text-gray-400 hover:text-red-500 transition-colors">
                     <Trash2 className="h-5 w-5" strokeWidth={1.5} />
                   </button>
                 </div>
                 <div className="flex items-center justify-between mt-auto pt-4">
                   <div className="flex items-center border border-gray-200">
                     <button 
-                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                      onClick={() => updateQuantity(item.productId, item.quantity - 1, item.size, item.color)}
                       className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition-colors"
                     >
                       <Minus className="h-3 w-3" />
                     </button>
                     <span className="w-12 text-center text-sm font-medium">{item.quantity}</span>
                     <button 
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.productId, item.quantity + 1, item.size, item.color)}
                       className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition-colors"
                     >
                       <Plus className="h-3 w-3" />

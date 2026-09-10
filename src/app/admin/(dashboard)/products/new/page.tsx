@@ -25,6 +25,8 @@ const productSchema = z.object({
   compareAtPrice: z.coerce.number().optional(),
   costPrice: z.coerce.number().optional(),
   stock: z.coerce.number().min(0),
+  sizes: z.string().optional(),
+  colors: z.string().optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -45,6 +47,8 @@ export default function NewProductPage() {
       description: "",
       price: 0,
       stock: 0,
+      sizes: "",
+      colors: "",
     },
   });
 
@@ -59,10 +63,16 @@ export default function NewProductPage() {
   const onSubmit = async (data: ProductFormValues) => {
     setLoading(true);
     try {
+      const payload = {
+        ...data,
+        sizes: data.sizes ? data.sizes.split(",").map(s => s.trim()).filter(Boolean) : [],
+        colors: data.colors ? data.colors.split(",").map(c => c.trim()).filter(Boolean) : [],
+      };
+
       const res = await fetch("/api/admin/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -163,6 +173,22 @@ export default function NewProductPage() {
             <div className="space-y-2">
               <Label htmlFor="stock">Stock Quantity</Label>
               <Input id="stock" type="number" {...form.register("stock")} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Variants (Optional)</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="sizes">Sizes (comma-separated)</Label>
+              <Input id="sizes" placeholder="S, M, L, XL" {...form.register("sizes")} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="colors">Colors (comma-separated)</Label>
+              <Input id="colors" placeholder="Red, Blue, Black" {...form.register("colors")} />
             </div>
           </CardContent>
         </Card>

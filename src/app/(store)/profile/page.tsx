@@ -6,7 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, LogOut, Package, User, MapPin, Heart } from "lucide-react";
+import { Loader2, LogOut, Package, User, MapPin, Heart, Copy, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -53,6 +53,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error", text: string } | null>(null);
+  const [referralCode, setReferralCode] = useState("");
+  const [referralCount, setReferralCount] = useState(0);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -83,6 +85,8 @@ export default function ProfilePage() {
           currentPassword: "",
           newPassword: "",
         });
+        setReferralCode(data.user.referralCode || "");
+        setReferralCount(data.user.referralCount || 0);
       }
     } catch (error) {
       console.error("Failed to fetch profile", error);
@@ -218,6 +222,37 @@ export default function ProfilePage() {
                       </FormItem>
                     )}
                   />
+
+                  {referralCode && (
+                    <div className="border-t pt-6 mt-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Users className="w-5 h-5 text-primary" />
+                        <h3 className="text-lg font-medium">Referral Program</h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Invite friends using your unique referral link. You have referred <strong>{referralCount}</strong> friends so far.
+                      </p>
+                      
+                      <div className="flex items-center gap-2 max-w-md">
+                        <Input 
+                          readOnly 
+                          value={`${typeof window !== 'undefined' ? window.location.origin : ''}/register?ref=${referralCode}`} 
+                          className="bg-slate-50"
+                        />
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/register?ref=${referralCode}`);
+                            setMessage({ type: "success", text: "Referral link copied to clipboard!" });
+                          }}
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="border-t pt-6 mt-6">
                     <h3 className="text-lg font-medium mb-4">Change Password</h3>

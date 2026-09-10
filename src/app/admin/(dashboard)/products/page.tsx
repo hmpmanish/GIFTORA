@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -21,10 +21,8 @@ export default async function AdminProductsPage() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Products</h1>
-        <Link href="/admin/products/new">
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" /> Add Product
-          </Button>
+        <Link href="/admin/products/new" className={buttonVariants({ variant: "default", className: "flex items-center gap-2" })}>
+          <Plus className="h-4 w-4" /> Add Product
         </Link>
       </div>
 

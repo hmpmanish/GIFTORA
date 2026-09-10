@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Plus, Edit } from "lucide-react";
+import Link from "next/link";
+import { DeleteCouponButton } from "./DeleteCouponButton";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +27,7 @@ export const metadata = {
 export default async function AdminCouponsPage() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || (session.user as any).role !== "ADMIN") {
+  if (!session?.user || ((session.user as any).role !== "ADMIN" && (session.user as any).role !== "STAFF")) {
     redirect("/admin/login");
   }
 
@@ -39,12 +41,12 @@ export default async function AdminCouponsPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 p-8">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Coupons</h1>
-        <Button disabled>
+        <Link href="/admin/coupons/new" className={buttonVariants({ variant: "default" })}>
           <Plus className="mr-2 h-4 w-4" /> Add Coupon
-        </Button>
+        </Link>
       </div>
 
       <Card>
@@ -66,12 +68,13 @@ export default async function AdminCouponsPage() {
                   <TableHead>Expiry</TableHead>
                   <TableHead>Usage</TableHead>
                   <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {coupons.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       No coupons found.
                     </TableCell>
                   </TableRow>
@@ -96,6 +99,16 @@ export default async function AdminCouponsPage() {
                         <Badge variant={coupon.isActive ? "default" : "secondary"}>
                           {coupon.isActive ? "Active" : "Inactive"}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Link href={`/admin/coupons/${coupon.id}/edit`}>
+                            <Button variant="outline" size="icon">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <DeleteCouponButton id={coupon.id} />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

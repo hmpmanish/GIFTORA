@@ -242,13 +242,10 @@ export default function CheckoutPage() {
                 <div className="w-full text-left space-y-2">
                   <Label className="text-xs uppercase tracking-wider text-gray-500">12-Digit UTR / Reference No *</Label>
                   <Input 
+                    {...form.register("upiUtr")}
                     placeholder="e.g. 312345678901" 
                     className="rounded-none h-12 bg-white text-center tracking-widest"
                     maxLength={12}
-                    value={(form as any).getValues('upiUtr') || ''}
-                    onChange={(e) => {
-                      (form as any).setValue('upiUtr', e.target.value.replace(/\D/g, ''));
-                    }}
                     required={paymentMethod === "UPI"}
                   />
                   <p className="text-xs text-gray-500 font-light mt-2">After paying, enter the 12-digit transaction reference number to confirm your order.</p>

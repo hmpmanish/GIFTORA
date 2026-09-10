@@ -28,6 +28,12 @@ model User {
   wishlist      Wishlist?
   notifications Notification[]
   activityLogs  AdminActivityLog[]
+
+  referralCode  String?   @unique
+  referredById  String?
+  referredBy    User?     @relation("Referrals", fields: [referredById], references: [id])
+  referrals     User[]    @relation("Referrals")
+  referralCount Int       @default(0)
 }
 
 model Account {
@@ -87,9 +93,13 @@ model Category {
   slug        String    @unique
   description String?
   image       String?
+  parentId    String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  products    Product[]
+  
+  parent        Category?  @relation("Subcategories", fields: [parentId], references: [id])
+  subcategories Category[] @relation("Subcategories")
+  products      Product[]
 }
 
 model Product {
@@ -112,6 +122,8 @@ model Product {
   isNewArrival     Boolean  @default(false)
   isActive         Boolean  @default(true)
   brand            String?
+  sizes            String[]
+  colors           String[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -160,6 +172,8 @@ model CartItem {
   cartId    String
   productId String
   quantity  Int
+  size      String?
+  color     String?
   cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
@@ -228,6 +242,8 @@ model OrderItem {
   productId String
   quantity  Int
   price     Float
+  size      String?
+  color     String?
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
 }
@@ -339,4 +355,14 @@ model AdminActivityLog {
   details   String?  @db.Text
   createdAt DateTime @default(now())
   admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String
+  link      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

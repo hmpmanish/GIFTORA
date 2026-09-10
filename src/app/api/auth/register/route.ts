@@ -4,9 +4,15 @@ import bcrypt from "bcryptjs";
 
 import prisma from "@/lib/prisma";
 
+function generateReferralCode(name: string) {
+  const prefix = name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, "USR");
+  const suffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `${prefix}${suffix}`;
+}
+
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, ref } = await req.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -26,7 +32,23 @@ export async function POST(req: Request) {
       );
     }
 
+    let referredById = null;
+    if (ref) {
+      const referrer = await prisma.user.findUnique({
+        where: { referralCode: ref },
+      });
+      if (referrer) {
+        referredById = referrer.id;
+        // Increment referrer's count
+        await prisma.user.update({
+          where: { id: referrer.id },
+          data: { referralCount: { increment: 1 } }
+        });
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+    const newReferralCode = generateReferralCode(name);
 
     const user = await prisma.user.create({
       data: {
@@ -34,6 +56,8 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         role: "CUSTOMER",
+        referralCode: newReferralCode,
+        referredById,
       },
     });
 

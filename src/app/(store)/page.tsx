@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ArrowRight, Package, ShieldCheck, Star, Headset, CheckCircle2, Building2 } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ export default async function HomePage() {
   let categories: any[] = [];
   let featuredProducts: any[] = [];
   let newArrivals: any[] = [];
+  let banners: any[] = [];
 
   try {
     const data = await Promise.all([
@@ -31,10 +33,15 @@ export default async function HomePage() {
         orderBy: { createdAt: "desc" },
         include: { images: true, category: true },
       }),
+      prisma.banner.findMany({
+        where: { isActive: true },
+        orderBy: { createdAt: "desc" },
+      }),
     ]);
     categories = data[0];
     featuredProducts = data[1];
     newArrivals = data[2];
+    banners = data[3];
   } catch (err: any) {
     console.error("Database error on homepage:", err);
   }
@@ -94,6 +101,9 @@ export default async function HomePage() {
     );
   };
 
+  const displayBanner = banners.length > 0 ? banners[0] : null;
+  const currentHeroImage = displayBanner?.imageUrl || HERO_IMAGE;
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Hero Section */}
@@ -101,8 +111,8 @@ export default async function HomePage() {
         {/* Stunning Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src={HERO_IMAGE} 
-            alt="Premium Gifting Experience" 
+            src={currentHeroImage} 
+            alt={displayBanner?.title || "Premium Gifting Experience"} 
             className="w-full h-full object-cover object-center"
           />
           {/* Professional Overlay */}
@@ -117,8 +127,14 @@ export default async function HomePage() {
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.1] drop-shadow-md">
-              Premium Gifting. <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-accent">Redefined.</span>
+              {displayBanner ? (
+                <span>{displayBanner.title}</span>
+              ) : (
+                <>
+                  Premium Gifting. <br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-accent">Redefined.</span>
+                </>
+              )}
             </h1>
             
             <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-xl leading-relaxed drop-shadow-sm">
@@ -126,16 +142,18 @@ export default async function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="w-full sm:w-auto h-14 px-8 text-base font-semibold bg-accent hover:bg-blue-700 text-white rounded-lg transition-all shadow-xl hover:shadow-accent/50 hover:-translate-y-0.5">
-                <Link href="/shop">
-                  Explore Catalog
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-base font-semibold border-white/30 text-white hover:bg-white/10 hover:text-white rounded-lg transition-all backdrop-blur-sm">
-                <Link href="/contact">
-                  Corporate Inquiry
-                </Link>
-              </Button>
+              <Link 
+                href={displayBanner?.link || "/shop"} 
+                className={cn(buttonVariants({ size: "lg" }), "w-full sm:w-auto h-14 px-8 text-base font-semibold bg-accent hover:bg-blue-700 text-white rounded-lg transition-all shadow-xl hover:shadow-accent/50 hover:-translate-y-0.5")}
+              >
+                {displayBanner?.link ? "Explore Offer" : "Explore Catalog"}
+              </Link>
+              <Link 
+                href="/contact"
+                className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full sm:w-auto h-14 px-8 text-base font-semibold border-white/30 text-white hover:bg-white/10 hover:text-white rounded-lg transition-all backdrop-blur-sm")}
+              >
+                Corporate Inquiry
+              </Link>
             </div>
 
             <div className="mt-12 flex flex-wrap items-center gap-6 text-sm text-slate-300 font-medium">
@@ -195,7 +213,7 @@ export default async function HomePage() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {categories.slice(0, 3).map((category, index) => (
-                <Link key={category.id} href={`/shop?category=${category.slug}`} className="group block">
+                <Link key={category.id} href={`/category/${category.slug}`} className="group block">
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 shadow-md group-hover:shadow-2xl transition-all duration-500">
                     <img 
                       src={FALLBACK_CATEGORY_IMAGE} 

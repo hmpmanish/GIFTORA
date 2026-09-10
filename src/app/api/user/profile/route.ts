@@ -36,6 +36,8 @@ export async function GET(req: Request) {
         phone: true,
         image: true,
         role: true,
+        referralCode: true,
+        referralCount: true,
         createdAt: true,
       },
     });

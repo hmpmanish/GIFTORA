@@ -30,7 +30,7 @@ export default function WishlistPage() {
       price: item.product.price,
       image: item.product.images[0]?.url || "",
       quantity: 1,
-      stock: item.product.stock,
+      stock: item.product.inventory?.stock || 0,
     });
     removeFromWishlist(item.productId);
     // Optional: add a toast notification here
@@ -101,19 +101,19 @@ export default function WishlistPage() {
               </Link>
               <div className="flex items-center gap-2 mb-4">
                 <span className="font-semibold text-lg">₹{item.product.price}</span>
-                {item.product.mrp > item.product.price && (
-                  <span className="text-sm text-muted-foreground line-through">₹{item.product.mrp}</span>
+                {item.product.compareAtPrice && item.product.compareAtPrice > item.product.price && (
+                  <span className="text-sm text-muted-foreground line-through">₹{item.product.compareAtPrice}</span>
                 )}
               </div>
               
               <div className="mt-auto">
                 <Button 
                   className="w-full" 
-                  disabled={item.product.stock <= 0}
+                  disabled={(item.product.inventory?.stock || 0) <= 0}
                   onClick={() => handleMoveToCart(item)}
                 >
                   <ShoppingCart className="mr-2 h-4 w-4" />
-                  {item.product.stock > 0 ? "Move to Cart" : "Out of Stock"}
+                  {(item.product.inventory?.stock || 0) > 0 ? "Move to Cart" : "Out of Stock"}
                 </Button>
               </div>
             </div>

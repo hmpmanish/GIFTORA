@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, slug, sku, categoryId, shortDescription, description, price, compareAtPrice, costPrice, stock } = body;
+    const { name, slug, sku, categoryId, shortDescription, description, price, compareAtPrice, costPrice, stock, sizes, colors } = body;
 
     if (!name || !slug || !sku || !categoryId || !price) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
@@ -39,6 +39,8 @@ export async function POST(req: Request) {
         price,
         compareAtPrice: compareAtPrice || null,
         costPrice: costPrice || null,
+        sizes: sizes || [],
+        colors: colors || [],
         inventory: {
           create: {
             stock: stock || 0

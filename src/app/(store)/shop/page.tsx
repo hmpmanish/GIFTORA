@@ -9,10 +9,12 @@ import prisma from "@/lib/prisma";
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: { q?: string; category?: string; sort?: string };
+  searchParams: Promise<{ q?: string; category?: string; sort?: string }>;
 }) {
-  const query = searchParams.q || "";
-  const category = searchParams.category || "";
+  const resolvedParams = await searchParams;
+  const query = resolvedParams.q || "";
+  const category = resolvedParams.category || "";
+  const sort = resolvedParams.sort || "newest";
   
   const whereClause: any = {
     isActive: true,
@@ -26,24 +28,66 @@ export default async function ShopPage({
     whereClause.category = { slug: category };
   }
 
-  const products = await prisma.product.findMany({
-    where: whereClause,
-    include: {
-      images: true,
-      category: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  let orderByClause: any = { createdAt: "desc" };
+  if (sort === "price-asc") orderByClause = { price: "asc" };
+  if (sort === "price-desc") orderByClause = { price: "desc" };
+  
+  const [products, categories] = await Promise.all([
+    prisma.product.findMany({
+      where: whereClause,
+      include: {
+        images: true,
+        category: true,
+      },
+      orderBy: orderByClause,
+    }),
+    prisma.category.findMany({
+      orderBy: { name: "asc" }
+    })
+  ]);
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-          {category ? `Category: ${category}` : "All Gifts"}
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          {products.length} {products.length === 1 ? "product" : "products"} found
-        </p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            {category ? `Category: ${category}` : "All Gifts"}
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            {products.length} {products.length === 1 ? "product" : "products"} found
+          </p>
+        </div>
+        <form method="GET" action="/shop" className="flex items-center gap-2">
+          <input 
+            type="text" 
+            name="q" 
+            defaultValue={query} 
+            placeholder="Search products..." 
+            className="border rounded-md px-3 py-2 text-sm w-[200px]" 
+          />
+          <select 
+            name="category" 
+            defaultValue={category} 
+            className="border rounded-md px-3 py-2 text-sm bg-white"
+          >
+            <option value="">All Categories</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.slug}>{c.name}</option>
+            ))}
+          </select>
+          <select 
+            name="sort" 
+            defaultValue={sort} 
+            className="border rounded-md px-3 py-2 text-sm bg-white"
+          >
+            <option value="newest">Newest First</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
+          <button type="submit" className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+            Apply
+          </button>
+        </form>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

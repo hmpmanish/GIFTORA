@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Truck, ShieldCheck, Undo2 } from "lucide-react";
 import Link from "next/link";
 import { AddToCartButton } from "./add-to-cart-button";
+import { ShareProductButton } from "./share-product-button";
 
 import prisma from "@/lib/prisma";
 
@@ -118,6 +119,8 @@ export default async function ProductDetailPage({
             <div className="w-full">
               <AddToCartButton product={product} inStock={inStock} />
             </div>
+
+            <ShareProductButton title={product.name} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t">
