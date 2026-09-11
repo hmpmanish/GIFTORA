@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,8 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export default function EditCouponPage({ params }: { params: { id: string } }) {
+export default function EditCouponPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -22,7 +23,7 @@ export default function EditCouponPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchCoupon = async () => {
       try {
-        const res = await fetch(`/api/admin/coupons/${params.id}`);
+        const res = await fetch(`/api/admin/coupons/${id}`);
         if (res.ok) {
           const data = await res.json();
           setCoupon(data.coupon);
@@ -39,7 +40,7 @@ export default function EditCouponPage({ params }: { params: { id: string } }) {
       }
     };
     fetchCoupon();
-  }, [params.id, router]);
+  }, [id, router]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,7 +61,7 @@ export default function EditCouponPage({ params }: { params: { id: string } }) {
     };
 
     try {
-      const res = await fetch(`/api/admin/coupons/${params.id}`, {
+      const res = await fetch(`/api/admin/coupons/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

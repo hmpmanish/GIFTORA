@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { CustomCursor } from "@/components/ui/custom-cursor";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -21,8 +22,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-900 selection:bg-blue-200 selection:text-blue-900">
-        <Providers>{children}</Providers>
+      <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
+        <Providers>
+          <CustomCursor />
+          {children}
+        </Providers>
       </body>
     </html>
   );
