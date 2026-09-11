@@ -78,8 +78,8 @@ export default async function AdminCategoriesPage() {
                     <TableRow key={category.id}>
                       <TableCell>
                         <div className="h-10 w-10 bg-slate-100 rounded flex items-center justify-center overflow-hidden">
-                          {category.imageUrl ? (
-                            <img src={category.imageUrl} alt={category.name} className="h-full w-full object-cover" />
+                          {category.image ? (
+                            <img src={category.image} alt={category.name} className="h-full w-full object-cover" />
                           ) : (
                             <span className="text-muted-foreground text-xs">No img</span>
                           )}
