@@ -22,7 +22,7 @@ const orderSchema = z.object({
     state: z.string(),
     pincode: z.string(),
   }).optional(),
-  paymentMethod: z.enum(["COD", "RAZORPAY", "UPI"]),
+  paymentMethod: z.enum(["COD", "RAZORPAY", "UPI", "CUSTOM_CARD"]),
   upiUtr: z.string().optional(),
   items: z.array(z.object({
     productId: z.string(),
@@ -188,6 +188,18 @@ export async function POST(req: Request) {
           },
         });
         return { orderId: order.id, amount: total, method: "UPI" };
+      }
+
+      if (paymentMethod === "CUSTOM_CARD") {
+        await tx.payment.create({
+          data: {
+            orderId: order.id,
+            method: "RAZORPAY", // We can store it as RAZORPAY or create a new enum in Prisma, let's just use RAZORPAY for DB compatibility if we can't change schema easily right now, or "UPI" if it's string. Wait, if Prisma PaymentMethod enum doesn't have CUSTOM_CARD, we must use an existing one or change Prisma schema. Let's look at schema.
+            status: "PENDING",
+            amount: total,
+          },
+        });
+        return { orderId: order.id, amount: total, method: "CUSTOM_CARD" };
       }
 
       throw new Error("Invalid payment method");

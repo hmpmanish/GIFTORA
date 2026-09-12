@@ -85,51 +85,9 @@ export default function CheckoutPage() {
         return;
       }
 
-      if (paymentMethod === "RAZORPAY") {
-        // Initialize Razorpay
-        const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "test_key", // Will be exposed to client
-          amount: orderData.amount,
-          currency: "INR",
-          name: "GIFTORA",
-          description: "Gift Purchase",
-          order_id: orderData.razorpayOrderId,
-          handler: async function (response: any) {
-            // Verify payment on server
-            const verifyRes = await fetch("/api/payments/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                orderId: orderData.orderId,
-              }),
-            });
-
-            if (verifyRes.ok) {
-              clearCart();
-              router.push(`/order-success?orderId=${orderData.orderId}`);
-            } else {
-              alert("Payment verification failed. If money was deducted, it will be refunded.");
-            }
-          },
-          prefill: {
-            name: data.fullName,
-            email: session?.user?.email || "",
-            contact: data.mobile,
-          },
-          theme: {
-            color: "#f59e0b", // Amber-500
-          },
-        };
-
-        const razorpay = new (window as any).Razorpay(options);
-        razorpay.open();
-        
-        razorpay.on('payment.failed', function (response: any){
-          alert("Payment failed");
-        });
+      if (paymentMethod === "CUSTOM_CARD") {
+        clearCart();
+        router.push(`/payment-gateway?orderId=${orderData.orderId}&amount=${orderData.amount}`);
       }
     } catch (error) {
       alert("Checkout failed");
@@ -213,9 +171,9 @@ export default function CheckoutPage() {
           <div className="bg-white border border-gray-200 p-8">
             <h2 className="font-heading uppercase tracking-widest text-lg mb-6">Payment Method</h2>
             <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-4">
-              <div className={`flex items-center space-x-4 border p-4 transition-colors ${paymentMethod === "RAZORPAY" ? 'border-black bg-stone-50' : 'border-gray-200'}`}>
-                <RadioGroupItem value="RAZORPAY" id="r1" />
-                <Label htmlFor="r1" className="flex-1 text-sm tracking-wide cursor-pointer uppercase">Online Payment (Cards/NetBanking)</Label>
+              <div className={`flex items-center space-x-4 border p-4 transition-colors ${paymentMethod === "CUSTOM_CARD" ? 'border-black bg-stone-50' : 'border-gray-200'}`}>
+                <RadioGroupItem value="CUSTOM_CARD" id="r1" />
+                <Label htmlFor="r1" className="flex-1 text-sm tracking-wide cursor-pointer uppercase">Online Payment (Mock Gateway)</Label>
               </div>
               <div className={`flex items-center space-x-4 border p-4 transition-colors ${paymentMethod === "UPI" ? 'border-black bg-stone-50' : 'border-gray-200'}`}>
                 <RadioGroupItem value="UPI" id="r2" />
